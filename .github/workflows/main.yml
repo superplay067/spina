@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Дает системе права на автоматическое создание релизов
+      contents: write # Дает права на создание релизов в репозитории
 
     steps:
     - name: Checkout the code
@@ -28,16 +28,13 @@ jobs:
     - name: Build with Gradle
       run: gradle assembleDebug --no-daemon
 
-    # Автоматически создаем релиз и прикрепляем чистый APK
-    - name: Create Release and Upload APK
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: \${{ format('v1.0.{0}', github.run_number) }}
-        name: \${{ format('Spina Release v1.0.{0}', github.run_number) }}
-        body: |
-          🚀 Автоматическая сборка проекта Spina.
-          
-          **Инструкция по установке:** Скачайте прикрепленный файл `app-debug.apk` ниже прямо на ваш Android-смартфон и запустите его. Распаковывать ничего не нужно!
-        draft: false
-        prerelease: false
-        files: app/build/outputs/apk/debug/app-debug.apk
+    # Создаем релиз через стандартную утилиту GitHub CLI (gh)
+    - name: Create GitHub Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        TAG_NAME="v1.0.${{ github.run_number }}"
+        gh release create "$TAG_NAME" \
+          app/build/outputs/apk/debug/app-debug.apk \
+          --title "Spina Release $TAG_NAME" \
+          --notes "🚀 Автоматическая сборка проекта Spina. Скачайте прикрепленный файл app-debug.apk ниже прямо на ваш Android-смартфон и запустите его."
