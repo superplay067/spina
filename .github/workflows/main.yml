@@ -20,13 +20,15 @@ jobs:
         distribution: 'zulu'
         java-version: '21'
 
+    # Настраиваем Gradle
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
+    # Запускаем компиляцию APK
     - name: Build with Gradle
       run: gradle assembleDebug --no-daemon
 
-    # Этот шаг создаст вкладку Release и прикрепит туда APK без архива
+    # Автоматически создаем релиз и прикрепляем чистый APK
     - name: Create Release and Upload APK
       uses: softprops/action-gh-release@v2
       with:
@@ -35,8 +37,7 @@ jobs:
         body: |
           🚀 Автоматическая сборка проекта Spina.
           
-          **Инструкция по установке:** Скачайте файл `app-debug.apk` ниже прямо на ваш Android-смартфон и запустите его. Распаковывать ничего не нужно!
+          **Инструкция по установке:** Скачайте прикрепленный файл `app-debug.apk` ниже прямо на ваш Android-смартфон и запустите его. Распаковывать ничего не нужно!
         draft: false
         prerelease: false
         files: app/build/outputs/apk/debug/app-debug.apk
-
