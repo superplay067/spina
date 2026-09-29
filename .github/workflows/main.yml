@@ -1,14 +1,14 @@
-name: Android CI
+name: Android CI & Release
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
     branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Дает системе права на автоматическое создание релизов
 
     steps:
     - name: Checkout the code
@@ -20,16 +20,23 @@ jobs:
         distribution: 'zulu'
         java-version: '21'
 
-    # Используем официальный экшен от Gradle, который сам установит нужную систему сборки
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
-    # Запускаем сборку напрямую через установленный gradle, а не через файл gradlew
     - name: Build with Gradle
-      run: gradle assembleDebug --no-daemon --stacktrace
+      run: gradle assembleDebug --no-daemon
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
+    # Этот шаг создаст вкладку Release и прикрепит туда APK без архива
+    - name: Create Release and Upload APK
+      uses: softprops/action-gh-release@v2
       with:
-        name: spina-debug-apk
-        path: app/build/outputs/apk/debug/
+        tag_name: v1.0.\${{ github.run_number }}
+        name: Spina Release v1.0.\${{ github.run_number }}
+        body: |
+          🚀 Автоматическая сборка проекта Spina.
+          
+          **Инструкция по установке:** Скачайте файл `app-debug.apk` ниже прямо на ваш Android-смартфон и запустите его. Распаковывать ничего не нужно!
+        draft: false
+        prerelease: false
+        files: app/build/outputs/apk/debug/app-debug.apk
+
