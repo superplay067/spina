@@ -32,8 +32,8 @@ jobs:
     - name: Create Release and Upload APK
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: "v1.0.\${{ github.run_number }}"
-        name: "Spina Release v1.0.\${{ github.run_number }}"
+        tag_name: \${{ format('v1.0.{0}', github.run_number) }}
+        name: \${{ format('Spina Release v1.0.{0}', github.run_number) }}
         body: |
           🚀 Автоматическая сборка проекта Spina.
           
